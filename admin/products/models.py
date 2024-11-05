@@ -6,5 +6,9 @@ class Products(models.Model):
     likes = models.PositiveIntegerField(default=0)
 
 
+class User(models.Model):
+    pass
+
+
 
 
