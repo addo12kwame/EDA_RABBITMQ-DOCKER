@@ -1,2 +1,2 @@
 .venv*
-./admin/.dbdata/
+admin/.dbdata/*
