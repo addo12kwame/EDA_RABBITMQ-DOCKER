@@ -1,2 +1,6 @@
 .venv*
 admin/.dbdata/*
+/.env
+/admin/.dbdata/
+/flask_main/.dbdata/
+
