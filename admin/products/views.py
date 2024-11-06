@@ -1,6 +1,3 @@
-from itertools import product
-
-from django.core.serializers import serialize
 from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.status import HTTP_201_CREATED, HTTP_202_ACCEPTED, HTTP_204_NO_CONTENT
@@ -8,6 +5,7 @@ from rest_framework.views import APIView
 import random
 
 from .models import Products,User
+from .producer import publish
 from .serializers import ProductSerializer
 
 
@@ -23,6 +21,7 @@ class ProductViewSet(viewsets.ViewSet):
         serializer = ProductSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        publish('product_created',serializer.data)
         return Response(serializer.data, status=HTTP_201_CREATED)
 
 
@@ -36,6 +35,8 @@ class ProductViewSet(viewsets.ViewSet):
         serializer = ProductSerializer(instance=product, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
+        publish('product_updated',serializer.data)
+
         return Response(serializer.data,status=HTTP_202_ACCEPTED)
 
 
@@ -43,6 +44,8 @@ class ProductViewSet(viewsets.ViewSet):
     def destroy(self,request,pk): #/api/products/<str:id>
         product = Products.objects.get(id=pk)
         product.delete()
+        publish('product_deleted',pk)
+
         return Response(status=HTTP_204_NO_CONTENT)
 
 
