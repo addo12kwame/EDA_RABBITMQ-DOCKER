@@ -1,10 +1,12 @@
-import json,pika,os
-from dotenv import load_dotenv
+import json,pika,os,time
 
-load_dotenv(".env")
-
-params = pika.URLParameters(os.getenv("API_KEY_RABBITMQ"))
-connection  = pika.BlockingConnection(params)
+while True:
+    try:
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='host.docker.internal', port=8090))
+        break
+    except pika.exceptions.AMQPConnectionError:
+        print("Producer: Waiting for RabbitMQ...")
+        time.sleep(5)
 
 channel = connection.channel()
 

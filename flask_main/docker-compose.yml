@@ -10,6 +10,7 @@ services:
       - .:/app
     depends_on:
       - db
+
   queue:
     build:
       context: .

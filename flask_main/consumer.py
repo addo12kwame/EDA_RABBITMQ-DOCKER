@@ -1,15 +1,8 @@
 import json,os,pika
+import time
 from main import Product,db,app
-from dotenv import load_dotenv
+from producer import channel
 
-load_dotenv(".env")
-
-params = pika.URLParameters(os.getenv("API_KEY_RABBITMQ"))
-connection  = pika.BlockingConnection(params)
-
-channel = connection.channel()
-
-channel.queue_declare(queue="main")
 
 def callback(ch,method,properties,body):
     print('Received in main')
@@ -36,8 +29,24 @@ def callback(ch,method,properties,body):
             print('product deleted')
 
 
-channel.basic_consume(queue='main',on_message_callback=callback,auto_ack=True)
+channel = None
+retries = 5
+while retries > 0:
+    try:
 
-print("Started Consuming")
-channel.start_consuming()
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='host.docker.internal', port=8090))
+
+        channel = connection.channel()
+        channel.queue_declare(queue="myqueue")
+        channel.basic_consume(queue='myqueue', on_message_callback=callback, auto_ack=True)
+
+        print("Started Consuming")
+        if retries < 5 :
+            retries = 5
+            print("Resetting retries")
+        channel.start_consuming()
+    except Exception:
+        print(f"Retries left {retries}")
+        time.sleep(5)
+        retries-=1
 channel.close()
