@@ -9,6 +9,7 @@ services:
     volumes:
       - .:/app
     depends_on:
+      - rq_queue
       - db
   queue:
     build:
@@ -16,6 +17,7 @@ services:
       dockerfile: Dockerfile
     command: 'python consumer.py'
     depends_on:
+      - rq_queue
       - db
   db:
     image: mysql:5.7.22
@@ -29,3 +31,9 @@ services:
       - .dbdata:/var/lib/mysql
     ports:
       - 33066:3306
+  rq_queue:
+    image: rabbitmq
+    restart: always
+    ports:
+      - 8090:5672
+

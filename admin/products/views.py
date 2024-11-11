@@ -51,8 +51,16 @@ class ProductViewSet(viewsets.ViewSet):
 
 class UserAPIView(APIView):
     def get(self,request):
+
+        user_rand = random.Random().randint(1,100)   # getting a random number
+        new_user = User(id=user_rand)
+        new_user.save()
         users = User.objects.all()
+        print(users)
         user = random.choice(users)
         return Response({
             'id':user.id
         })
+
+
+

@@ -1,19 +1,19 @@
-import json,os,django,pika
-from dotenv import load_dotenv
-
-load_dotenv(".env")
+import json,os,django,pika,time
 
 
-
-#
-# os.environ.setdefault("DJANGO_SETTINGS_MODULE","admin.settings")
-# django.setup()
-
-# from products.models import Products
-print(os.getenv("API_KEY_RABBITMQ"))
-
-params = pika.URLParameters(os.getenv("API_KEY_RABBITMQ"))
-connection  = pika.BlockingConnection(params)
+######################################################################################
+os.environ.setdefault("DJANGO_SETTINGS_MODULE","admin.settings")          #
+django.setup()                                                                      #
+                                                                                   #
+from products.models import Products                                              #
+################################################################################ #
+while True:
+    try:
+        connection = pika.BlockingConnection(pika.ConnectionParameters(host='host.docker.internal', port=8090))
+        break
+    except pika.exceptions.AMQPConnectionError:
+        print("Consumer: Waiting for RabbitMQ...")
+        time.sleep(5)
 
 channel = connection.channel()
 
